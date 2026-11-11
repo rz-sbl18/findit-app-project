@@ -5,7 +5,13 @@ import { ReportCard } from "@/components/ReportCard";
 export const dynamic = "force-dynamic";
 
 export default async function Home() {
-  const { rows } = await listReports({ pageSize: 6 }).catch(() => ({ rows: [], total: 0 }));
+  let rows: Awaited<ReturnType<typeof listReports>>["rows"] = [];
+  let failed = false;
+  try {
+    rows = (await listReports({ pageSize: 6 })).rows;
+  } catch {
+    failed = true;
+  }
   return (
     <div className="space-y-12">
       <section className="rounded-2xl bg-gradient-to-br from-navy-800 to-navy-600 px-6 py-14 text-center text-white sm:px-12">
@@ -40,7 +46,9 @@ export default async function Home() {
           <h2 className="text-xl font-bold text-navy-800">Laporan terbaru</h2>
           <Link href="/gallery" className="text-sm font-semibold text-sky-600">Lihat semua →</Link>
         </div>
-        {rows.length === 0 ? (
+        {failed ? (
+          <p className="card p-8 text-center text-red-600">Data belum dapat dimuat. Coba lagi beberapa saat.</p>
+        ) : rows.length === 0 ? (
           <p className="card p-8 text-center text-slate-500">Belum ada laporan. Jadilah yang pertama membuat laporan.</p>
         ) : (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">{rows.map((r) => <ReportCard key={r.id} r={r} />)}</div>

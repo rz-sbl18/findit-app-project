@@ -9,6 +9,15 @@ import { clientIp, jsonError, rateLimit, sameOrigin } from "@/lib/security";
 const DUMMY_HASH = bcrypt.hashSync("dummy-password-for-timing", 12);
 
 export async function POST(req: NextRequest) {
+  try {
+    return await handle(req);
+  } catch (e) {
+    console.error("login error", e instanceof Error ? e.message : e);
+    return jsonError(503, "Server belum dikonfigurasi dengan benar. Hubungi admin.");
+  }
+}
+
+async function handle(req: NextRequest) {
   if (!sameOrigin(req)) return jsonError(403, "Permintaan lintas-origin ditolak");
   const ip = clientIp(req);
   if (!rateLimit(`login-ip:${ip}`, 20, 5 * 60 * 1000).ok) return jsonError(429, "Terlalu banyak percobaan login. Coba lagi nanti.");

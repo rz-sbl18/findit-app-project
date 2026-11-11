@@ -17,10 +17,9 @@ export const registerSchema = z
     email: z.string().trim().toLowerCase().email("Email tidak valid").max(254),
     password: z
       .string()
-      .min(10, "Password minimal 10 karakter")
+      .min(8, "Password minimal 8 karakter")
       .max(72, "Password maksimal 72 karakter")
-      .regex(/[a-z]/, "Password harus memuat huruf kecil")
-      .regex(/[A-Z]/, "Password harus memuat huruf besar")
+      .regex(/[A-Za-z]/, "Password harus memuat huruf")
       .regex(/[0-9]/, "Password harus memuat angka"),
     confirm_password: z.string(),
   })

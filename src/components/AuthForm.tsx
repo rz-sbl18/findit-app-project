@@ -15,21 +15,24 @@ export function AuthForm({ mode, next }: { mode: "login" | "register"; next?: st
     setBusy(true);
     const f = new FormData(e.currentTarget);
     const body = Object.fromEntries(f.entries());
-    const res = await fetch(`/api/auth/${mode}`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-    });
+    let res: Response;
+    try {
+      res = await fetch(`/api/auth/${mode}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+    } catch {
+      setBusy(false);
+      return setError("Tidak dapat terhubung ke server. Periksa koneksi internet Anda.");
+    }
     const data = await res.json().catch(() => ({}));
     setBusy(false);
-    if (!res.ok) return setError(data.error ?? "Terjadi kesalahan");
-    if (isLogin) {
-      const safe = next && next.startsWith("/") && !next.startsWith("//") ? next : "/dashboard";
-      window.location.href = safe;
-    } else {
-      setOk("Registrasi berhasil. Silakan masuk.");
-      setTimeout(() => (window.location.href = "/login"), 800);
-    }
+    if (!res.ok) return setError(data.error ?? "Layanan sedang bermasalah. Coba lagi beberapa saat.");
+    // Registrasi langsung masuk (auto-login); login mengikuti parameter next yang aman.
+    const safe = next && next.startsWith("/") && !next.startsWith("//") ? next : "/dashboard";
+    setOk(isLogin ? "Berhasil masuk…" : "Akun berhasil dibuat. Mengalihkan…");
+    window.location.href = safe;
   }
 
   return (
@@ -40,7 +43,7 @@ export function AuthForm({ mode, next }: { mode: "login" | "register"; next?: st
           {!isLogin && (
             <div>
               <label className="label" htmlFor="full_name">Nama lengkap</label>
-              <input id="full_name" name="full_name" className="input" required minLength={2} maxLength={100} autoComplete="name" />
+              <input id="full_name" name="full_name" className="input" required minLength={2} maxLength={100} autoComplete="name" pattern="[^<>]*" title="Tanpa karakter < atau >" />
             </div>
           )}
           <div>
@@ -50,7 +53,7 @@ export function AuthForm({ mode, next }: { mode: "login" | "register"; next?: st
           <div>
             <label className="label" htmlFor="password">Password</label>
             <input id="password" name="password" type="password" className="input" required maxLength={72} autoComplete={isLogin ? "current-password" : "new-password"} />
-            {!isLogin && <p className="mt-1 text-xs text-slate-500">Minimal 10 karakter, memuat huruf besar, huruf kecil, dan angka.</p>}
+            {!isLogin && <p className="mt-1 text-xs text-slate-500">Minimal 8 karakter, memuat huruf dan angka.</p>}
           </div>
           {!isLogin && (
             <div>

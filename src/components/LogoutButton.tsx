@@ -5,7 +5,7 @@ export function LogoutButton() {
   const [busy, setBusy] = useState(false);
   return (
     <button
-      className="btn btn-ghost"
+      className="btn btn-ghost !rounded-full"
       disabled={busy}
       onClick={async () => {
         setBusy(true);

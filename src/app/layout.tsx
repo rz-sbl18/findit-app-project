@@ -13,12 +13,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="id">
       <body className="min-h-screen">
         <Navbar />
-        <main className="mx-auto max-w-6xl px-4 py-8">
+        <main className="mx-auto max-w-6xl px-4 pb-10 pt-28 sm:pt-32">
           <BackButton />
           {children}
         </main>
-        <footer className="border-t border-slate-200 py-6 text-center text-xs text-slate-400">
-          FindIt — Secure Lost &amp; Found Portal
+        <footer className="border-t border-slate-200 bg-white py-8 text-center">
+          <p className="text-lg font-extrabold text-navy-800">Find<span className="text-accent-500">It</span></p>
+          <p className="mt-1 text-xs text-slate-500">Secure Lost &amp; Found Portal — laporkan, cari, dan kembalikan barang dengan aman.</p>
         </footer>
       </body>
     </html>

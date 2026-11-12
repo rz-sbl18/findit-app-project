@@ -144,8 +144,10 @@ try {
   for (let i = 0; i < 8; i++) codes.push((await call("/api/auth/login", { method: "POST", json: { email: `sectest-rl-${rnd}@example.test`, password: "SalahTerus" + i } })).status);
   record(11, "Rate limiting login", "8 login gagal beruntun untuk email yang sama", "Muncul 429 setelah batas (5 percobaan)", `status=${codes.join(",")}`, codes.includes(429));
 
-  // pembersihan
-  await call(`/api/reports/${id}`, { method: "DELETE", cookie: A });
+  // pembersihan: sesi A sudah dibatalkan oleh logout, jadi login ulang lalu hapus laporan uji
+  const again = await call("/api/auth/login", { method: "POST", json: { email: emailA, password: PASS } });
+  const cA = cookieOf(again.res);
+  for (const rid of [id, before.data?.id]) if (rid) await call(`/api/reports/${rid}`, { method: "DELETE", cookie: cA });
 } catch (e) {
   console.error("Pengujian berhenti:", e.message);
   results.push({ no: 0, name: "Persiapan", steps: "-", expected: "-", actual: e.message, status: "Fail" });

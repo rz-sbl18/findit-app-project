@@ -1,5 +1,5 @@
 import { db } from "./supabase";
-import { PAGE_SIZE, PUBLIC_COLUMNS, Report } from "./constants";
+import { CATEGORIES, PAGE_SIZE, PUBLIC_COLUMNS, Report } from "./constants";
 import { sanitizeSearch } from "./validation";
 
 export type ListParams = {
@@ -20,6 +20,8 @@ function firstName(r: Report): Report {
 }
 
 export async function listReports(p: ListParams): Promise<{ rows: Report[]; total: number }> {
+  // Kategori divalidasi terhadap daftar tetap; nilai asing = tidak ada hasil (bukan error).
+  if (p.category && !(CATEGORIES as readonly string[]).includes(p.category)) return { rows: [], total: 0 };
   const size = p.pageSize ?? PAGE_SIZE;
   const page = Math.max(1, p.page ?? 1);
   let query = db()
@@ -36,7 +38,10 @@ export async function listReports(p: ListParams): Promise<{ rows: Report[]; tota
     .order("incident_date", { ascending: p.sort === "oldest" })
     .order("created_at", { ascending: p.sort === "oldest" })
     .range((page - 1) * size, page * size - 1);
-  if (error) throw new Error("Gagal membaca data laporan");
+  if (error) {
+    console.error("listReports failed", error.code, error.message);
+    throw new Error("Gagal membaca data laporan");
+  }
   return { rows: ((data ?? []) as unknown as Report[]).map(firstName), total: count ?? 0 };
 }
 

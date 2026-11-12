@@ -1,5 +1,20 @@
 type Stats = Awaited<ReturnType<typeof import("@/lib/data").adminStats>>;
 
+
+function Bars({ rows }: { rows: [string, number][] }) {
+  const max = Math.max(1, ...rows.map(([, c]) => c));
+  return (
+    <ul className="space-y-2">
+      {rows.map(([k, c]) => (
+        <li key={k} className="text-sm">
+          <div className="mb-0.5 flex justify-between"><span>{k}</span><span className="font-semibold">{c}</span></div>
+          <div className="h-2.5 overflow-hidden rounded-full bg-navy-50"><div className="h-full rounded-full bg-navy-600" style={{ width: `${(c / max) * 100}%` }} /></div>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
 export function StatsView({ s }: { s: Stats }) {
   const cards = [
     ["Laporan bulan ini", s.thisMonth],
@@ -24,13 +39,13 @@ export function StatsView({ s }: { s: Stats }) {
         <div className="card p-4">
           <h3 className="mb-2 font-semibold text-navy-800">Rekap per bulan</h3>
           {s.byMonth.length === 0 ? <p className="text-sm text-slate-500">Belum ada data.</p> : (
-            <table className="w-full text-sm"><tbody>{s.byMonth.map(([m, c]) => <tr key={m} className="border-t"><td className="py-1.5">{m}</td><td className="text-right font-semibold">{c}</td></tr>)}</tbody></table>
+            <Bars rows={s.byMonth} />
           )}
         </div>
         <div className="card p-4">
           <h3 className="mb-2 font-semibold text-navy-800">Rekap per kategori</h3>
           {s.byCategory.length === 0 ? <p className="text-sm text-slate-500">Belum ada data.</p> : (
-            <table className="w-full text-sm"><tbody>{s.byCategory.map(([m, c]) => <tr key={m} className="border-t"><td className="py-1.5">{m}</td><td className="text-right font-semibold">{c}</td></tr>)}</tbody></table>
+            <Bars rows={s.byCategory} />
           )}
         </div>
       </div>

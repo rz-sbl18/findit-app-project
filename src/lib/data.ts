@@ -95,3 +95,15 @@ export async function adminStats() {
     byCategory: Object.entries(byCategory).sort(([, a], [, b]) => b - a),
   };
 }
+
+/** Statistik publik untuk beranda (hanya jumlah, tanpa data pribadi). */
+export async function publicStats() {
+  const { data } = await db().from("reports").select("status").eq("is_active", true).limit(10000);
+  const rows = (data ?? []) as Array<{ status: string }>;
+  return {
+    total: rows.length,
+    lost: rows.filter((r) => r.status === "HILANG").length,
+    found: rows.filter((r) => r.status === "DITEMUKAN").length,
+    done: rows.filter((r) => r.status === "SELESAI").length,
+  };
+}

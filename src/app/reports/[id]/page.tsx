@@ -1,10 +1,12 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { getReport } from "@/lib/data";
+import { getReport, listReports } from "@/lib/data";
 import { getSession } from "@/lib/auth";
-import { TYPE_LABEL } from "@/lib/constants";
+import { CATEGORY_ICON, TYPE_LABEL, timeAgo } from "@/lib/constants";
 import { uuidSchema } from "@/lib/validation";
 import { StatusBadge } from "@/components/Badge";
+import { ShareButtons } from "@/components/ShareButtons";
+import { ReportCard } from "@/components/ReportCard";
 
 export const dynamic = "force-dynamic";
 
@@ -15,9 +17,10 @@ export default async function ReportDetail({ params }: { params: Promise<{ id: s
   const r = await getReport(id, { viewerId: user?.id, isAdmin: user?.role === "ADMIN" });
   if (!r) notFound();
   const isOwner = user?.id === r.user_id;
+  const related = (await listReports({ category: r.category, pageSize: 5 }).catch(() => ({ rows: [], total: 0 }))).rows.filter((x) => x.id !== r.id).slice(0, 4);
 
   return (
-    <article className="mx-auto max-w-3xl">
+    <article className="mx-auto max-w-4xl">
       <Link href="/gallery" className="text-sm text-sky-600">← Kembali ke galeri</Link>
       <div className="card mt-3 overflow-hidden">
         {r.image_url && (
@@ -34,9 +37,9 @@ export default async function ReportDetail({ params }: { params: Promise<{ id: s
           <h1 className="text-2xl font-bold text-navy-900">{r.item_name}</h1>
           <p className="whitespace-pre-wrap text-slate-700">{r.description}</p>
           <dl className="grid gap-3 text-sm sm:grid-cols-2">
-            <div><dt className="text-slate-400">Kategori</dt><dd className="font-medium">{r.category}</dd></div>
+            <div><dt className="text-slate-400">Kategori</dt><dd className="font-medium">{CATEGORY_ICON[r.category]} {r.category}</dd></div>
             <div><dt className="text-slate-400">Lokasi</dt><dd className="font-medium">{r.location}</dd></div>
-            <div><dt className="text-slate-400">Tanggal kejadian</dt><dd className="font-medium">{new Date(r.incident_date).toLocaleDateString("id-ID", { dateStyle: "long" })}</dd></div>
+            <div><dt className="text-slate-400">Tanggal kejadian</dt><dd className="font-medium">{new Date(r.incident_date).toLocaleDateString("id-ID", { dateStyle: "long" })} <span className="text-slate-400">({timeAgo(r.incident_date)})</span></dd></div>
             <div><dt className="text-slate-400">Dilaporkan oleh</dt><dd className="font-medium">{r.profiles?.full_name ?? "Pengguna FindIt"}</dd></div>
           </dl>
 
@@ -51,9 +54,18 @@ export default async function ReportDetail({ params }: { params: Promise<{ id: s
             )}
             <p className="mt-2 text-xs text-slate-500">Demi keamanan, verifikasi kepemilikan secara langsung dan bertemu di area umum kampus.</p>
           </div>
-          {isOwner && <Link className="btn btn-ghost" href={`/my-reports/${r.id}/edit`}>Ubah laporan</Link>}
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <ShareButtons title={r.item_name} />
+            {isOwner && <Link className="btn btn-primary" href={`/my-reports/${r.id}/edit`}>Ubah laporan</Link>}
+          </div>
         </div>
       </div>
+      {related.length > 0 && (
+        <section className="mt-10">
+          <h2 className="mb-3 text-lg font-bold text-navy-800">Barang serupa ({r.category})</h2>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">{related.map((x) => <ReportCard key={x.id} r={x} />)}</div>
+        </section>
+      )}
     </article>
   );
 }

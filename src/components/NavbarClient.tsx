@@ -36,7 +36,7 @@ export function NavbarClient({ user }: { user: { name: string; role: string } | 
         onFocus={() => setHover(true)}
         onBlur={() => setHover(false)}
         className={`pointer-events-auto flex items-center gap-x-1 gap-y-1 overflow-hidden border border-white/60 bg-white/80 px-3 py-2 shadow-lg shadow-navy-900/10 ring-1 ring-slate-200/70 backdrop-blur-md transition-all duration-300 ease-out ${
-          small ? "w-[7.25rem] max-w-full flex-nowrap rounded-full" : "w-full max-w-4xl flex-wrap rounded-3xl md:rounded-full md:px-4"
+          small ? "min-h-[3.25rem] w-auto flex-nowrap justify-center rounded-full" : "min-h-[3.25rem] w-full max-w-4xl flex-wrap rounded-3xl md:rounded-full md:px-4"
         }`}
       >
         {canGoBack && (
@@ -50,10 +50,10 @@ export function NavbarClient({ user }: { user: { name: string; role: string } | 
             <span aria-hidden>←</span>
           </button>
         )}
-        <Link href="/" className="mx-auto shrink-0 text-xl font-extrabold tracking-tight text-navy-800 sm:mx-0 sm:mr-2" onClick={() => setHover(false)}>
+        <Link href="/" className={`shrink-0 text-xl font-extrabold tracking-tight text-navy-800 ${small ? "px-1" : "mx-auto sm:mx-0 sm:mr-2"}`} onClick={() => setHover(false)}>
           Find<span className="text-accent-500">It</span>
         </Link>
-        <div className={`flex flex-1 flex-wrap items-center gap-1 transition-opacity duration-200 ${small ? "pointer-events-none invisible w-0 flex-none overflow-hidden opacity-0" : "opacity-100"}`}>
+        <div className={`flex flex-1 flex-wrap items-center gap-1 transition-opacity duration-200 ${small ? "hidden" : "opacity-100"}`}>
           <Link href="/gallery" className={link}>Galeri</Link>
           {user && (
             <>

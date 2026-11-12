@@ -43,3 +43,22 @@ export type Report = {
 /** Kolom yang aman dipublikasikan (tanpa contact_info). */
 export const PUBLIC_COLUMNS =
   "id,user_id,item_name,category,description,report_type,location,incident_date,image_url,share_contact,status,is_active,created_at,updated_at";
+
+export const CATEGORY_ICON: Record<string, string> = {
+  Elektronik: "💻",
+  Dokumen: "📄",
+  Aksesori: "⌚",
+  Tas: "🎒",
+  Pakaian: "👕",
+  "Peralatan kuliah": "📚",
+  Lainnya: "📦",
+};
+
+export function timeAgo(dateStr: string): string {
+  const days = Math.floor((Date.now() - new Date(dateStr).getTime()) / 86400000);
+  if (days <= 0) return "Hari ini";
+  if (days === 1) return "Kemarin";
+  if (days < 30) return `${days} hari lalu`;
+  if (days < 365) return `${Math.floor(days / 30)} bulan lalu`;
+  return `${Math.floor(days / 365)} tahun lalu`;
+}

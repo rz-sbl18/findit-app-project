@@ -107,23 +107,23 @@ BASE_URL=https://findit-app-delta.vercel.app npm run test:security
 
 Skrip membuat akun uji sementara dan menyimpan tabel hasil ke `docs/security-test-results.md`. Cakupan: IDOR, RBAC, XSS, SQL Injection, secret exposure (sisi situs), sesi dan cookie, upload, password lemah, CSRF, security headers, rate limiting.
 
-Status saat ini: **hasil pengujian nyata belum dimasukkan.** Tabel di bawah diisi dari output skrip, bukan dari asumsi.
+Hasil terakhir (13 November 2026, terhadap https://findit-app-delta.vercel.app, output skrip dijalankan oleh pemilik proyek): **11 dari 11 skenario lulus.**
 
-| No | Skenario | Status |
-|---|---|---|
-| 1 | IDOR | Belum dijalankan |
-| 2 | RBAC | Belum dijalankan |
-| 3 | XSS | Belum dijalankan |
-| 4 | SQL Injection | Belum dijalankan |
-| 5 | Secret exposure | Belum dijalankan |
-| 6 | Sesi dan cookie | Belum dijalankan |
-| 7 | Upload | Belum dijalankan |
-| 8 | Password lemah | Belum dijalankan |
-| 9 | CSRF | Belum dijalankan |
-| 10 | Security headers | Belum dijalankan |
-| 11 | Rate limiting | Belum dijalankan |
+| No | Skenario | Hasil aktual | Status |
+|---|---|---|---|
+| 1 | IDOR | User B: PATCH 404, DELETE 404; status laporan tetap HILANG. Field `role` dan `user_id` ditolak (400) | Pass |
+| 2 | RBAC | User biasa: 403 pada API admin dan export, halaman `/admin` 403; anonim: API 401, halaman 307 ke login | Pass |
+| 3 | XSS | Payload `<script>` di nama dan deskripsi ditolak (400); di parameter `?q=` tidak muncul mentah di HTML | Pass |
+| 4 | SQL Injection | Login 401 tanpa cookie; pencarian dan filter 200 dengan 0 hasil. **Temuan awal:** payload di parameter `category` membuat API menjawab 500. **Perbaikan:** kategori divalidasi terhadap daftar tetap (commit `39592dc`). **Sesudah:** 200, total 0 | Pass (setelah perbaikan) |
+| 5 | Secret exposure (situs) | `/.env`, `/.git/config` 404; tidak ada secret di HTML | Pass |
+| 6 | Sesi dan cookie | HttpOnly, Secure, SameSite=Lax, Path=/, prefix `__Host-`, Max-Age; token lama dan token palsu 401 setelah logout | Pass |
+| 7 | Upload | PNG valid 201; `.php`, isi palsu, MIME salah, dan file lebih dari 2 MB semuanya 400 | Pass |
+| 8 | Password lemah | Pendek, tanpa angka, hanya angka, dan `password1` semuanya 400 | Pass |
+| 9 | CSRF | Origin asing dan tanpa Origin: 403 | Pass |
+| 10 | Security headers | Semua header wajib ada | Pass |
+| 11 | Rate limiting login | Percobaan ke-6 dan seterusnya mendapat 429 (best effort per instance) | Pass |
 
-Pemeriksaan tambahan yang dilakukan manual: `npm audit`, pemindaian riwayat git (`git log -p | grep`), dan pengecekan header di securityheaders.com.
+Pemeriksaan tambahan yang masih perlu dilengkapi pemilik proyek: `npm audit` dan pengecekan header di securityheaders.com. Pemindaian riwayat git (`git log -p | grep`) tidak menemukan secret.
 
 Pengujian RLS langsung di database (role `anon`) sudah dilakukan: membaca `profiles`, membaca `contact_info`, dan meng-update `reports` semuanya ditolak dengan `permission denied`.
 

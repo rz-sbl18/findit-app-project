@@ -11,6 +11,13 @@ const safeText = (min: number, max: number, label: string) =>
     // eslint-disable-next-line no-control-regex
     .refine((v) => !/[<>]/.test(v) && !/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/.test(v), `${label} mengandung karakter yang tidak diizinkan`);
 
+const COMMON_PASSWORDS = new Set([
+  "password", "password1", "password12", "password123", "passw0rd", "qwerty123", "qwertyui", "qwerty12",
+  "12345678", "123456789", "1234567890", "11111111", "00000000", "abc12345", "abcd1234", "iloveyou1",
+  "admin123", "admin1234", "welcome1", "welcome123", "letmein1", "test1234", "indonesia1", "indonesia123",
+  "kampus123", "mahasiswa1", "findit123", "findit1234",
+]);
+
 export const registerSchema = z
   .object({
     full_name: safeText(2, 100, "Nama"),
@@ -20,7 +27,8 @@ export const registerSchema = z
       .min(8, "Password minimal 8 karakter")
       .max(72, "Password maksimal 72 karakter")
       .regex(/[A-Za-z]/, "Password harus memuat huruf")
-      .regex(/[0-9]/, "Password harus memuat angka"),
+      .regex(/[0-9]/, "Password harus memuat angka")
+      .refine((v) => !COMMON_PASSWORDS.has(v.toLowerCase()) && !/^(.)\1+$/.test(v), "Password terlalu umum atau mudah ditebak"),
     confirm_password: z.string(),
   })
   .strict()

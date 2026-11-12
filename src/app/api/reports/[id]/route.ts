@@ -43,6 +43,10 @@ export async function PATCH(req: NextRequest, ctx: Ctx) {
 
   const update: Record<string, unknown> = { ...v };
   if ("contact_info" in v) update.contact_info = v.contact_info || null;
+  if ("held_location" in v) {
+    if (existing.report_type === "FOUND") update.held_location = v.held_location || null;
+    else delete update.held_location;
+  }
 
   let newImage: string | null = null;
   try {

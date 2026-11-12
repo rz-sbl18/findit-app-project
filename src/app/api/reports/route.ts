@@ -53,6 +53,7 @@ export async function POST(req: NextRequest) {
       location: v.location,
       incident_date: v.incident_date,
       contact_info: v.contact_info || null,
+      held_location: v.report_type === "FOUND" ? v.held_location || null : null,
       share_contact: v.share_contact,
       status: v.report_type === "LOST" ? "HILANG" : "DITEMUKAN",
       image_url,

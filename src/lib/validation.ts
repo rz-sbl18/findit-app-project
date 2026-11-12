@@ -47,6 +47,7 @@ export const reportFields = {
   incident_date: dateStr,
   contact_info: safeText(0, 200, "Kontak").optional().or(z.literal("")),
   share_contact: z.boolean(),
+  held_location: safeText(0, 200, "Lokasi penyimpanan").optional().or(z.literal("")),
 };
 
 export const createReportSchema = z
@@ -63,6 +64,7 @@ export const updateReportSchema = z
     incident_date: reportFields.incident_date.optional(),
     contact_info: reportFields.contact_info,
     share_contact: reportFields.share_contact.optional(),
+    held_location: reportFields.held_location,
     status: z.enum(STATUSES).optional(),
   })
   .strict();

@@ -16,7 +16,7 @@ export const STATUS_LABEL: Record<string, string> = {
   DITEMUKAN: "Ditemukan",
   SELESAI: "Selesai",
 };
-export const TYPE_LABEL: Record<string, string> = { LOST: "Barang Hilang", FOUND: "Barang Ditemukan" };
+export const TYPE_LABEL: Record<string, string> = { LOST: "Kehilangan", FOUND: "Penemuan" };
 
 export const MAX_IMAGE_BYTES = 2 * 1024 * 1024;
 export const PAGE_SIZE = 12;
@@ -32,6 +32,7 @@ export type Report = {
   incident_date: string;
   image_url: string | null;
   contact_info?: string | null;
+  held_location?: string | null;
   share_contact: boolean;
   status: "HILANG" | "DITEMUKAN" | "SELESAI";
   is_active: boolean;
@@ -42,7 +43,7 @@ export type Report = {
 
 /** Kolom yang aman dipublikasikan (tanpa contact_info). */
 export const PUBLIC_COLUMNS =
-  "id,user_id,item_name,category,description,report_type,location,incident_date,image_url,share_contact,status,is_active,created_at,updated_at";
+  "id,user_id,item_name,category,description,report_type,location,incident_date,image_url,share_contact,status,is_active,created_at,updated_at,held_location";
 
 export const CATEGORY_ICON: Record<string, string> = {
   Elektronik: "💻",

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { CATEGORY_ICON, Report, timeAgo } from "@/lib/constants";
 import { StatusBadge } from "./Badge";
+import { TypeBadge } from "./TypeBadge";
 
 export function ReportCard({ r }: { r: Report }) {
   return (
@@ -15,6 +16,7 @@ export function ReportCard({ r }: { r: Report }) {
         <div className="absolute left-3 top-3"><StatusBadge status={r.status} /></div>
       </div>
       <div className="space-y-1.5 p-4">
+        <TypeBadge type={r.report_type} />
         <h3 className="line-clamp-1 font-semibold text-navy-900 group-hover:text-navy-600">{r.item_name}</h3>
         <p className="line-clamp-1 text-sm text-slate-500">📍 {r.location}</p>
         <div className="flex items-center justify-between text-xs text-slate-400">

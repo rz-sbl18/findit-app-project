@@ -24,7 +24,7 @@ export function ShareButtons({ title }: { title: string }) {
       <button
         type="button"
         className="btn btn-ghost"
-        onClick={() => window.open(`https://wa.me/?text=${encodeURIComponent(`${title} — ${url()}`)}`, "_blank", "noopener,noreferrer")}
+        onClick={() => window.open(`https://wa.me/?text=${encodeURIComponent(`${title} | ${url()}`)}`, "_blank", "noopener,noreferrer")}
       >
         💬 Bagikan ke WhatsApp
       </button>

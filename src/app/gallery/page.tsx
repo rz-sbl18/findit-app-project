@@ -4,7 +4,7 @@ import { CATEGORIES, CATEGORY_ICON, PAGE_SIZE } from "@/lib/constants";
 import { ReportCard } from "@/components/ReportCard";
 
 export const dynamic = "force-dynamic";
-type SP = { q?: string; category?: string; status?: string; sort?: string; page?: string };
+type SP = { type?: string; q?: string; category?: string; status?: string; sort?: string; page?: string };
 
 export default async function Gallery({ searchParams }: { searchParams: Promise<SP> }) {
   const sp = await searchParams;
@@ -12,7 +12,7 @@ export default async function Gallery({ searchParams }: { searchParams: Promise<
   let result = { rows: [] as Awaited<ReturnType<typeof listReports>>["rows"], total: 0 };
   let failed = false;
   try {
-    result = await listReports({ q: sp.q, category: sp.category, status: sp.status, sort: sp.sort, page });
+    result = await listReports({ type: sp.type, q: sp.q, category: sp.category, status: sp.status, sort: sp.sort, page });
   } catch {
     failed = true;
   }
@@ -45,6 +45,12 @@ export default async function Gallery({ searchParams }: { searchParams: Promise<
         {tab("📦 Ditemukan", "DITEMUKAN")}
         {tab("✅ Selesai", "SELESAI")}
       </div>
+      <div className="flex flex-wrap items-center gap-2 text-xs">
+        <span className="font-semibold text-slate-500">Jenis laporan:</span>
+        {[["", "Semua"], ["LOST", "🔎 Kehilangan"], ["FOUND", "📦 Penemuan"]].map(([v, l]) => (
+          <Link key={v} href={qs({ type: v, page: "1" })} className={`rounded-full border px-3 py-1 font-medium ${(sp.type ?? "") === v ? "border-navy-700 bg-navy-50 text-navy-700" : "border-slate-300 bg-white text-slate-600"}`}>{l}</Link>
+        ))}
+      </div>
       <div className="flex gap-2 overflow-x-auto pb-1">
         <Link href={qs({ category: "", page: "1" })} className={`whitespace-nowrap rounded-full border px-3 py-1 text-xs font-medium ${!sp.category ? "border-navy-700 bg-navy-50 text-navy-700" : "border-slate-300 bg-white text-slate-600"}`}>Semua kategori</Link>
         {CATEGORIES.map((c) => (
@@ -56,6 +62,7 @@ export default async function Gallery({ searchParams }: { searchParams: Promise<
 
       <form method="get" className="card grid gap-3 p-4 sm:grid-cols-[1fr_auto_auto]">
         {sp.status && <input type="hidden" name="status" value={sp.status} />}
+        {sp.type && <input type="hidden" name="type" value={sp.type} />}
         {sp.category && <input type="hidden" name="category" value={sp.category} />}
         <input name="q" defaultValue={sp.q ?? ""} placeholder="🔍 Cari nama, deskripsi, lokasi…" maxLength={60} className="input" aria-label="Kata kunci" />
         <select name="sort" defaultValue={sp.sort ?? "newest"} className="input" aria-label="Urutkan">

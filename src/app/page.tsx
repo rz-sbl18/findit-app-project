@@ -26,15 +26,15 @@ export default async function Home() {
             Barangmu hilang? <span className="text-accent-400">Temukan di FindIt.</span>
           </h1>
           <p className="mx-auto mt-5 max-w-2xl text-sky-100">
-            Satu tempat untuk melaporkan dan mencari barang hilang atau ditemukan — tanpa harus menyebar info lewat grup chat.
+            Satu tempat untuk melaporkan dan mencari barang hilang atau ditemukan, tanpa harus menyebar info lewat grup chat.
           </p>
           <form action="/gallery" method="get" className="mx-auto mt-8 flex max-w-xl gap-2 rounded-full bg-white p-1.5 shadow-xl">
             <input name="q" maxLength={60} placeholder="Cari dompet, KTM, kunci, tumbler…" aria-label="Cari barang" className="min-w-0 flex-1 rounded-full bg-transparent px-4 text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none" />
             <button className="btn btn-accent !rounded-full">Cari</button>
           </form>
           <div className="mt-6 flex flex-wrap justify-center gap-3">
-            <Link href="/reports/new" className="btn bg-white/10 text-white hover:bg-white/20 !rounded-full">+ Buat laporan</Link>
-            <Link href="/gallery" className="btn bg-white/10 text-white hover:bg-white/20 !rounded-full">Lihat galeri</Link>
+            <Link href="/reports/new?type=LOST" className="btn bg-white/10 text-white hover:bg-white/20 !rounded-full">🔎 Saya kehilangan barang</Link>
+            <Link href="/reports/new?type=FOUND" className="btn bg-white/10 text-white hover:bg-white/20 !rounded-full">📦 Saya menemukan barang</Link>
           </div>
         </div>
       </section>
@@ -104,7 +104,10 @@ export default async function Home() {
       <section className="rounded-3xl bg-navy-50 px-6 py-10 text-center">
         <h2 className="text-2xl font-bold text-navy-800">Kehilangan atau menemukan sesuatu?</h2>
         <p className="mt-1 text-slate-600">Buat laporan dalam kurang dari satu menit.</p>
-        <Link href="/reports/new" className="btn btn-primary mt-5 !rounded-full">Buat laporan sekarang</Link>
+        <div className="mt-5 flex flex-wrap justify-center gap-3">
+          <Link href="/reports/new?type=LOST" className="btn btn-primary !rounded-full">🔎 Lapor kehilangan</Link>
+          <Link href="/reports/new?type=FOUND" className="btn btn-accent !rounded-full">📦 Lapor penemuan</Link>
+        </div>
       </section>
     </div>
   );

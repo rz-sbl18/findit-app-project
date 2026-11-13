@@ -127,6 +127,23 @@ Pemeriksaan tambahan yang masih perlu dilengkapi pemilik proyek: `npm audit` dan
 
 Pengujian RLS langsung di database (role `anon`) sudah dilakukan: membaca `profiles`, membaca `contact_info`, dan meng-update `reports` semuanya ditolak dengan `permission denied`.
 
+## Temuan dependency dan pemindaian eksternal
+
+`npm audit` (13 November 2026) menemukan 3 kerentanan; laporan lengkap ada di `docs/npm-audit-report.txt`. Keputusan: **risiko diterima sementara**, dengan alasan berikut.
+
+| Paket | Tingkat | Masalah | Penilaian untuk FindIt | Keputusan |
+|---|---|---|---|---|
+| `zod` (< 4.6.6) | High | Memori dapat habis saat memvalidasi array atau set besar yang dibatasi | Tidak ada skema `z.array`, `z.set`, `z.record`, atau `z.map` di kode. Semua input berupa string dan objek kecil dengan batas panjang. Jalur serangan tidak ada | Diterima. Naik ke 4.x dijadwalkan setelah pengujian kompatibilitas |
+| `postcss` (<= 8.5.22, di dalam `next`) | High | XSS pada `</style>` di output stringify, pembacaan file lewat `sourceMappingURL` | Hanya berjalan saat build CSS milik sendiri; tidak memproses CSS dari pengguna di runtime | Diterima. Perbaikan lewat rilis `next` berikutnya; `npm audit fix --force` ditolak karena memaksa `next` 16 (perubahan besar) |
+| `next` (turunan `postcss`) | Moderate | Mengikuti `postcss` | Sama seperti di atas | Diterima |
+
+Pemindaian eksternal terhadap https://findit-app-delta.vercel.app (12 November 2026, 23:53 sampai 23:55 UTC):
+
+- securityheaders.com: **A** (Content-Security-Policy, Permissions-Policy, Referrer-Policy, Strict-Transport-Security, X-Content-Type-Options, X-Frame-Options semuanya ada). Nilai dibatasi di A karena CSP masih memakai `'unsafe-inline'` untuk script.
+- SSL Labs: **A+** pada 216.198.79.195 dan **A** pada 64.29.17.195.
+
+Masa berlaku sesi: token JWT berlaku 8 jam (klaim `exp`), diverifikasi di server pada setiap request. Token yang dimanipulasi dan token lama setelah logout ditolak (skenario 6).
+
 ## Penggunaan AI agent
 
 Alat: **Claude (Anthropic)**, dipakai lewat antarmuka Claude Code.
